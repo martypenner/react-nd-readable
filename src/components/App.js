@@ -1,10 +1,12 @@
+import Row from 'jsxstyle/Row';
+import AppBar from 'material-ui/AppBar';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import React from 'react';
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
 
 import EditPost from './EditPost';
-import Logo from './Logo';
 import Home from './Home';
+import Logo from './Logo';
 import PostDetail from './PostDetail';
 import PostsByCategory from './PostsByCategory';
 
@@ -12,9 +14,17 @@ const App = () => (
   <MuiThemeProvider>
     <Router>
       <div>
-        <div>
-          <Logo />
-        </div>
+        <AppBar
+          iconElementLeft={
+            <Link to="/" style={{ textDecoration: 'none', color: '#000' }}>
+              <Row alignItems="center">
+                <Logo />
+
+                <span style={{ marginLeft: 10 }}>Readable</span>
+              </Row>
+            </Link>
+          }
+        />
 
         <Link to="/">Home</Link>
         <br />
