@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
 
 import EditPost from './EditPost';
+import Logo from './Logo';
 import Home from './Home';
 import PostDetail from './PostDetail';
 import PostsByCategory from './PostsByCategory';
@@ -11,6 +12,10 @@ const App = () => (
   <MuiThemeProvider>
     <Router>
       <div>
+        <div>
+          <Logo />
+        </div>
+
         <Link to="/">Home</Link>
         <br />
         <Link to="/posts-by-category/1">Posts by Category</Link>
