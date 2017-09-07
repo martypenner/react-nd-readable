@@ -7,10 +7,14 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.0.13"
+    "react-scripts": "1.0.13",
+    "reddit-clone-server": "git+https://github.com/martypenner/reactnd-project-readable-starter.git#c4a8fca02aa64a34601b6a737663483dee130893"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently --kill-others --names 'server,client' 'node ./node_modules/reddit-clone-server/server.js' 'react-scripts start'",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
