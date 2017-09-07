@@ -12,9 +12,13 @@ const App = () => (
     <Router>
       <div>
         <Link to="/">Home</Link>
+        <br />
         <Link to="/posts-by-category/1">Posts by Category</Link>
+        <br />
         <Link to="/post/1">Post Detail</Link>
+        <br />
         <Link to="/edit/1">Edit Post</Link>
+        <br />
 
         <Route path="/" exact component={Home} />
         <Route
