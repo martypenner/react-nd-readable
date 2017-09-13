@@ -26,22 +26,24 @@ const App = () => (
           }
         />
 
-        <Link to="/">Home</Link>
-        <br />
-        <Link to="/posts-by-category/1">Posts by Category</Link>
-        <br />
-        <Link to="/post/1">Post Detail</Link>
-        <br />
-        <Link to="/edit/1">Edit Post</Link>
-        <br />
+        <div className="app">
+          <Link to="/">Home</Link>
+          <br />
+          <Link to="/posts-by-category/1">Posts by Category</Link>
+          <br />
+          <Link to="/post/1">Post Detail</Link>
+          <br />
+          <Link to="/edit/1">Edit Post</Link>
+          <br />
 
-        <Route path="/" exact component={Home} />
-        <Route
-          path="/posts-by-category/:categoryId"
-          component={PostsByCategory}
-        />
-        <Route path="/post/:postId" component={PostDetail} />
-        <Route path="/edit/:postId" component={EditPost} />
+          <Route path="/" exact component={Home} />
+          <Route
+            path="/posts-by-category/:categoryId"
+            component={PostsByCategory}
+          />
+          <Route path="/post/:postId" component={PostDetail} />
+          <Route path="/edit/:postId" component={EditPost} />
+        </div>
       </div>
     </Router>
   </MuiThemeProvider>
