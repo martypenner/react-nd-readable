@@ -17,15 +17,16 @@ const App = () => (
     <Router>
       <div>
         <Appbar style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
-          <Link
-            to="/"
-            className="mui--appbar-height"
-            style={{
-              display: 'flex',
-              textDecoration: 'none',
-              color: '#000'
-            }}>
-            <Row flex="1" alignItems="center">
+          <Row flex="1" alignItems="center">
+            <Link
+              to="/"
+              className="mui--appbar-height"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                color: '#000'
+              }}>
               <Logo />
 
               <span
@@ -33,15 +34,15 @@ const App = () => (
                 style={{ marginLeft: '1rem' }}>
                 Readable
               </span>
+            </Link>
 
-              <Row
-                style={{
-                  marginLeft: 'auto' // Pin to the end of the row
-                }}>
-                <NavLink to="/edit/1">Add post</NavLink>
-              </Row>
-            </Row>
-          </Link>
+            <div
+              style={{
+                marginLeft: 'auto' // Pin to the end of the row
+              }}>
+              <NavLink to="/edit/1">Add post</NavLink>
+            </div>
+          </Row>
         </Appbar>
 
         <Container fluid style={{ padding: '4rem' }}>
