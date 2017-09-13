@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import {
   getAllCategories,
-  getAllPostsSortedByTime
+  getAllPostsSortedByKey
 } from '../redux/posts-categories';
 import Categories from './Categories';
 import Posts from './Posts';
@@ -16,6 +16,6 @@ const Home = ({ posts, categories }) => (
 );
 
 export default connect(state => ({
-  posts: getAllPostsSortedByTime(state),
+  posts: getAllPostsSortedByKey(state, 'timestamp'),
   categories: getAllCategories(state)
 }))(Home);

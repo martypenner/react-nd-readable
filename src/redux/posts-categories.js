@@ -170,9 +170,7 @@ export default reducer;
 /** Selectors **/
 
 export const getAllPosts = state => state.postsAndCategories.posts;
-export const getAllPostsSortedByTime = state =>
-  getAllPosts(state).sort((a, b) => a.timestamp - b.timestamp);
-export const getAllPostsSortedByVotes = state =>
-  getAllPosts(state).sort((a, b) => a.voteScore - b.voteScore);
+export const getAllPostsSortedByKey = (state, key) =>
+  getAllPosts(state).sort((a, b) => a[key] - b[key]);
 
 export const getAllCategories = state => state.postsAndCategories.categories;
