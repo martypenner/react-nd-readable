@@ -1,37 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 import {
   getAllCategories,
   getAllPostsSortedByTime
 } from '../redux/posts-categories';
+import Categories from './Categories';
+import Posts from './Posts';
 
-const Posts = ({ posts, categories }) => (
+const Home = ({ posts, categories }) => (
   <div>
-    <div>
-      <h2>Categories</h2>
-
-      {categories.map(category => (
-        <div key={category.name}>
-          <Link to={`/${category.path}`}>{category.name}</Link>
-        </div>
-      ))}
-    </div>
-
-    <div>
-      <h2>Posts</h2>
-
-      {posts.map(post => (
-        <div key={post.id}>
-          <Link to={`/${post.category}/${post.id}`}>{post.title}</Link>
-        </div>
-      ))}
-    </div>
+    <Categories categories={categories} />
+    <Posts posts={posts} />
   </div>
 );
 
 export default connect(state => ({
   posts: getAllPostsSortedByTime(state),
   categories: getAllCategories(state)
-}))(Posts);
+}))(Home);
