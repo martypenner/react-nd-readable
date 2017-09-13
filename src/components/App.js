@@ -49,9 +49,9 @@ const App = () => (
 
           <Container fluid style={{ padding: '4rem' }}>
             <Route path="/" exact component={Home} />
-            <Route path="/:category" component={PostsByCategory} />
-            <Route path="/:category/:postId" component={PostDetail} />
-            <Route path="/edit/:postId" component={EditPost} />
+            <Route path="/:category" exact component={PostsByCategory} />
+            <Route path="/:category/:postId" exact component={PostDetail} />
+            <Route path="/edit/:postId" exact component={EditPost} />
           </Container>
         </div>
       </Router>
