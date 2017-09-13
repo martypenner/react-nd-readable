@@ -1,3 +1,4 @@
+import 'muicss/dist/css/mui.css';
 import './index.css';
 
 import React from 'react';
