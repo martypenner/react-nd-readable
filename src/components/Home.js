@@ -1,7 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-const Posts = ({ posts = postsDummy, categories = categoriesDummy }) => (
+import {
+  getAllCategories,
+  getAllPostsSortedByTime
+} from '../redux/posts-categories';
+
+const Posts = ({ posts, categories }) => (
   <div>
     <div>
       <h2>Categories</h2>
@@ -25,30 +31,7 @@ const Posts = ({ posts = postsDummy, categories = categoriesDummy }) => (
   </div>
 );
 
-const postsDummy = [
-  {
-    id: 1,
-    title: 'This is some interesting street art.',
-    author: 'Timigos',
-    timestamp: Date.now(),
-    voteScore: 17,
-    category: 'react'
-  }
-];
-
-const categoriesDummy = [
-  {
-    name: 'react',
-    path: 'react'
-  },
-  {
-    name: 'redux',
-    path: 'redux'
-  },
-  {
-    name: 'udacity',
-    path: 'udacity'
-  }
-];
-
-export default Posts;
+export default connect(state => ({
+  posts: getAllPostsSortedByTime(state),
+  categories: getAllCategories(state)
+}))(Posts);
