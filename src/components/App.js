@@ -15,7 +15,7 @@ const App = () => (
   <MuiThemeProvider>
     <Router>
       <div>
-        <Appbar style={{ paddingLeft: 10, paddingRight: 10 }}>
+        <Appbar style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
           <Link
             to="/"
             className="mui--appbar-height"
@@ -27,7 +27,7 @@ const App = () => (
             <Row alignItems="center">
               <Logo />
 
-              <span className="mui--text-headline" style={{ marginLeft: 10 }}>
+              <span className="mui--text-headline" style={{ marginLeft: '1rem' }}>
                 Readable
               </span>
             </Row>
@@ -35,7 +35,7 @@ const App = () => (
         </Appbar>
 
         <Container fluid>
-          <div style={{ marginBottom: 40 }}>
+          <div style={{ marginBottom: '4rem' }}>
             <Link to="/">Home</Link>
             <br />
             <Link to="/posts-by-category/1">Posts by Category</Link>

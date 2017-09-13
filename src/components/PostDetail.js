@@ -1,45 +1,25 @@
-import React from 'react';
-import * as moment from 'moment';
+import Col from 'jsxstyle/Col';
 import Flex from 'jsxstyle/Flex';
 import Row from 'jsxstyle/Row';
-import Col from 'jsxstyle/Col';
-import Block from 'jsxstyle/Block';
-import ThumbUp from 'react-icons/lib/md/thumb-up';
-import ThumbDown from 'react-icons/lib/md/thumb-down';
-import * as colors from 'material-ui/styles/colors';
+import * as moment from 'moment';
+import React from 'react';
 import Markdown from 'react-markdown';
+
 import Comment from './Comment';
+import Voter from './Voter';
 
 const PostDetail = ({ post = postDummy }) => {
   const submittedDate = moment(post.timestamp);
 
   return (
     <div>
-      <Flex style={{ marginBottom: 10 }}>
+      <Flex style={{ marginBottom: '1rem' }}>
         <Row flex="1" justifyContent="space-between">
-          <Col
-            flex="1"
-            style={{ minWidth: '4.4rem', marginTop: '0.7rem' }}
-            className="mui--text-dark-secondary">
-            <ThumbUp
-              color={colors.indigo500}
-              role="button"
-              aria-label="upvote"
-              tabIndex="0"
-            />
-            {/* todo: change look based on up- or down-voted */}
-            <span title={post.voteScore}>{post.voteScore}</span>
-            <ThumbDown
-              color={colors.red500}
-              role="button"
-              aria-label="downvote"
-              tabIndex="0"
-            />
-          </Col>
+          <Voter voteScore={post.voteScore} />
 
           <Col flex="30">
             <div>
-              <div className="mui--text-display1" style={{ marginBottom: 5 }}>
+              <div className="mui--text-display1" style={{ marginBottom: '0.5rem' }}>
                 {post.title}
               </div>
               <div className="mui--text-caption mui--text-dark-secondary">
