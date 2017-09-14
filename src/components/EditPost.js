@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import {
   getAllCategories,
   getEditingPost,
+  savePost,
   updatePostAuthor,
   updatePostBody,
   updatePostCategory,
@@ -17,10 +18,12 @@ import {
 const EditPost = ({
   post,
   categories,
+  canSubmitForm,
   updatePostAuthor,
   updatePostBody,
   updatePostTitle,
-  updatePostCategory
+  updatePostCategory,
+  savePost
 }) => (
   <div>
     <div>
@@ -65,19 +68,33 @@ const EditPost = ({
       </SelectField>
     </div>
 
-    <RaisedButton primary label="Submit" disabled />
+    <RaisedButton
+      primary
+      label="Submit"
+      disabled={!canSubmitForm}
+      onClick={() => savePost(post)}
+    />
   </div>
 );
 
 export default connect(
-  state => ({
-    post: getEditingPost(state),
-    categories: getAllCategories(state)
-  }),
+  () => state => {
+    const post = getEditingPost(state);
+    const requiredFields = ['author', 'title', 'body', 'category'];
+
+    return {
+      post,
+      categories: getAllCategories(state),
+      canSubmitForm:
+        requiredFields.filter(field => Boolean(post[field])).length ===
+        requiredFields.length
+    };
+  },
   {
     updatePostAuthor,
     updatePostBody,
     updatePostTitle,
-    updatePostCategory
+    updatePostCategory,
+    savePost
   }
 )(EditPost);

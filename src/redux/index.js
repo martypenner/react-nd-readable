@@ -144,6 +144,18 @@ const initialPosts = [
 
 const postsReducer = (state = initialPosts, action) => {
   switch (action.type) {
+    case SAVE_POST:
+      // todo: temporary; need to save to server first
+      return [
+        ...state,
+        {
+          ...action.post,
+          id: 2,
+          timestamp: Date.now(),
+          voteScore: 1,
+          comments: []
+        }
+      ];
     default:
       return state;
   }
@@ -195,6 +207,11 @@ export const updatePostTitle = title => ({
 export const updatePostCategory = category => ({
   type: UPDATE_POST_CATEGORY,
   category
+});
+
+export const savePost = post => ({
+  type: SAVE_POST,
+  post
 });
 
 const initialEditingState = {
