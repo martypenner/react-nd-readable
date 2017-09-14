@@ -53,7 +53,7 @@ const EditPost = ({
       <SelectField
         floatingLabelText="Category"
         value={post.category}
-        onChange={(_, __, value) => updatePostCategory(value)}
+        onChange={(...params) => updatePostCategory(params[2])}
         maxHeight={200}>
         {categories.map(category => (
           <MenuItem
