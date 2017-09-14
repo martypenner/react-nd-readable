@@ -10,6 +10,10 @@ import { getPostById } from '../redux';
 import Comment from './Comment';
 import Voter from './Voter';
 
+const EmptyComments = () => (
+  <div className="mui--text-dark-secondary">This post has no comments</div>
+);
+
 const PostDetail = ({ post }) => {
   const submittedDate = moment(post.timestamp);
 
@@ -62,6 +66,8 @@ const PostDetail = ({ post }) => {
         {post.comments.map(comment => (
           <Comment comment={comment} key={comment.id} />
         ))}
+
+        {post.comments.length === 0 && <EmptyComments />}
       </div>
     </div>
   );
