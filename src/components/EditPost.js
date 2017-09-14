@@ -1,13 +1,42 @@
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import SelectField from 'material-ui/SelectField';
-import React from 'react';
 import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import TextField from 'material-ui/TextField';
+import React from 'react';
+import { connect } from 'react-redux';
 
-const EditPost = props => (
+import {
+  getAllCategories,
+  getEditingPost,
+  updatePostAuthor,
+  updatePostBody,
+  updatePostCategory,
+  updatePostTitle
+} from '../redux';
+
+const EditPost = ({
+  post,
+  categories,
+  updatePostAuthor,
+  updatePostBody,
+  updatePostTitle,
+  updatePostCategory
+}) => (
   <div>
     <div>
-      <TextField floatingLabelText="Title" />
+      <TextField
+        floatingLabelText="Author"
+        hintText="The name of the author"
+        value={post.author}
+        onChange={e => updatePostAuthor(e.target.value)}
+      />
+    </div>
+    <div>
+      <TextField
+        floatingLabelText="Title"
+        value={post.title}
+        onChange={e => updatePostTitle(e.target.value)}
+      />
     </div>
     <div>
       <TextField
@@ -15,32 +44,24 @@ const EditPost = props => (
         rows={10}
         floatingLabelText="Text"
         hintText="The main content of your post"
+        value={post.body}
+        onChange={e => updatePostBody(e.target.value)}
       />
     </div>
 
     <div>
       <SelectField
         floatingLabelText="Category"
-        value={''}
-        onChange={() => {}}
+        value={post.category}
+        onChange={(_, __, value) => updatePostCategory(value)}
         maxHeight={200}>
-        <MenuItem
-          key={Math.random()}
-          value={Math.random()}
-          primaryText={`Item ${Math.random()}`}
-        />
-
-        <MenuItem
-          key={Math.random()}
-          value={Math.random()}
-          primaryText={`Item ${Math.random()}`}
-        />
-
-        <MenuItem
-          key={Math.random()}
-          value={Math.random()}
-          primaryText={`Item ${Math.random()}`}
-        />
+        {categories.map(category => (
+          <MenuItem
+            key={category.name}
+            value={category.name}
+            primaryText={category.name}
+          />
+        ))}
       </SelectField>
     </div>
 
@@ -48,4 +69,15 @@ const EditPost = props => (
   </div>
 );
 
-export default EditPost;
+export default connect(
+  state => ({
+    post: getEditingPost(state),
+    categories: getAllCategories(state)
+  }),
+  {
+    updatePostAuthor,
+    updatePostBody,
+    updatePostTitle,
+    updatePostCategory
+  }
+)(EditPost);

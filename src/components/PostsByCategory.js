@@ -1,10 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {
-  getAllCategories,
-  getAllPostsSortedByKey
-} from '../redux/posts-categories';
+import { getAllCategories, getAllPostsSortedByKey } from '../redux';
 import Categories from './Categories';
 import Posts from './Posts';
 

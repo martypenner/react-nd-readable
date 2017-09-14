@@ -6,7 +6,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
 
-import { getPostById } from '../redux/posts-categories';
+import { getPostById } from '../redux';
 import Comment from './Comment';
 import Voter from './Voter';
 
