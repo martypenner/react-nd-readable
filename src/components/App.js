@@ -4,7 +4,7 @@ import Appbar from 'muicss/lib/react/appbar';
 import Container from 'muicss/lib/react/container';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 
 import store from '../redux/store';
 import EditPost from './EditPost';
@@ -48,10 +48,12 @@ const App = () => (
           </Appbar>
 
           <Container fluid style={{ padding: '4rem' }}>
-            <Route path="/" exact component={Home} />
-            <Route path="/:category" exact component={PostsByCategory} />
-            <Route path="/:category/:postId" exact component={PostDetail} />
-            <Route path="/edit/:postId" exact component={EditPost} />
+            <Switch>
+              <Route path="/" exact component={Home} />
+              <Route path="/edit/:postId" component={EditPost} />
+              <Route path="/:category" exact component={PostsByCategory} />
+              <Route path="/:category/:postId" component={PostDetail} />
+            </Switch>
           </Container>
         </div>
       </Router>
