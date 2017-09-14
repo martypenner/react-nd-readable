@@ -172,5 +172,7 @@ export default reducer;
 export const getAllPosts = state => state.postsAndCategories.posts;
 export const getAllPostsSortedByKey = (state, key) =>
   getAllPosts(state).sort((a, b) => a[key] - b[key]);
+export const getPostById = (state, id) =>
+  getAllPosts(state).find(post => Number(post.id) === Number(id));
 
 export const getAllCategories = state => state.postsAndCategories.categories;
