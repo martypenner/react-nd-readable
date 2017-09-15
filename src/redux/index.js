@@ -7,14 +7,19 @@ import uuid from 'uuid/v4';
 
 import { apiBaseUrl, apiToken } from '../utils/api';
 
-const initialPosts = [];
-
-const postsReducer = (state = initialPosts, action) => {
+const postsReducer = (state = [], action) => {
   switch (action.type) {
     case SAVE_POST_SUCCEEDED:
       return [...state, action.payload];
-    case FETCH_POSTS_SUCCEEDED:
+    case FETCH_INITIAL_DATA_SUCCEEDED:
       return [...state, ...action.payload];
+    default:
+      return state;
+  }
+};
+
+const commentsReducer = (state = [], action) => {
+  switch (action.type) {
     default:
       return state;
   }
@@ -51,9 +56,9 @@ const SAVE_POST = 'SAVE_POST';
 const SAVE_POST_SUCCEEDED = 'SAVE_POST_SUCCEEDED';
 const SAVE_POST_FAILED = 'SAVE_POST_FAILED';
 
-const FETCH_POSTS = 'FETCH_POSTS';
-const FETCH_POSTS_SUCCEEDED = 'FETCH_POSTS_SUCCEEDED';
-const FETCH_POSTS_FAILED = 'FETCH_POSTS_FAILED';
+const FETCH_INITIAL_DATA = 'FETCH_INITIAL_DATA';
+const FETCH_INITIAL_DATA_SUCCEEDED = 'FETCH_INITIAL_DATA_SUCCEEDED';
+const FETCH_INITIAL_DATA_FAILED = 'FETCH_INITIAL_DATA_FAILED';
 
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
@@ -80,7 +85,7 @@ export const savePost = payload => ({
   payload
 });
 
-export const fetchPosts = () => ({ type: FETCH_POSTS });
+export const fetchInitialData = () => ({ type: FETCH_INITIAL_DATA });
 
 const initialEditingState = {
   post: {
@@ -135,10 +140,12 @@ export const isSavingPost = state => state.editing.isSaving;
 
 export const getAllCategories = state => state.categories;
 
+export const getCommentsForPost = (state, postId) => state.comments[postId] || [];
+
 /** Root reducer **/
 
 const initialRootState = {
-  posts: initialPosts,
+  posts: [],
   categories: initialCategories,
   editing: initialEditingState
 };
@@ -147,6 +154,7 @@ const rootReducer = (state = initialRootState, action) => ({
   posts: postsReducer(state.posts, action),
   categories: categoriesReducer(state.categories, action),
   editing: editingPostReducer(state.editing, action),
+  comments: commentsReducer(state.comments, action),
   routing: routerReducer
 });
 
@@ -154,20 +162,20 @@ export default rootReducer;
 
 /** Epics **/
 
-const fetchPostsEpic = action$ =>
-  action$.ofType(FETCH_POSTS).mergeMap(() =>
+const fetchInitialDataEpic = action$ =>
+  action$.ofType(FETCH_INITIAL_DATA).mergeMap(() =>
     ajax
       .getJSON(`${apiBaseUrl}/posts`, {
         Accept: 'application/json',
         Authorization: apiToken
       })
       .map(response => ({
-        type: FETCH_POSTS_SUCCEEDED,
+        type: FETCH_INITIAL_DATA_SUCCEEDED,
         payload: response
       }))
       .catch(error =>
         Observable.of({
-          type: FETCH_POSTS_FAILED,
+          type: FETCH_INITIAL_DATA_FAILED,
           payload: error.xhr.response,
           error: true
         })
@@ -205,4 +213,4 @@ const savePostEpic = action$ =>
       );
   });
 
-export const rootEpic = combineEpics(savePostEpic, fetchPostsEpic);
+export const rootEpic = combineEpics(savePostEpic, fetchInitialDataEpic);

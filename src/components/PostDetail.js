@@ -6,7 +6,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
 
-import { getPostById } from '../redux';
+import { getCommentsForPost, getPostById } from '../redux';
 import Comment from './Comment';
 import Voter from './Voter';
 
@@ -14,7 +14,7 @@ const EmptyComments = () => (
   <div className="mui--text-dark-secondary">This post has no comments</div>
 );
 
-const PostDetail = ({ post }) => {
+const PostDetail = ({ post, comments }) => {
   if (post == null) {
     return null;
   }
@@ -51,8 +51,8 @@ const PostDetail = ({ post }) => {
                 '$1'
               )}#comments`}
               rel="nofollow">
-              {post.comments.length} comment{post.comments.length === 0 ||
-              post.comments.length > 1 ? (
+              {comments.length} comment{comments.length === 0 ||
+              comments.length > 1 ? (
                 's'
               ) : (
                 ''
@@ -67,16 +67,17 @@ const PostDetail = ({ post }) => {
       <div>
         <h2 id="comments">Comments</h2>
 
-        {post.comments.map(comment => (
+        {comments.map(comment => (
           <Comment comment={comment} key={comment.id} />
         ))}
 
-        {post.comments.length === 0 && <EmptyComments />}
+        {comments.length === 0 && <EmptyComments />}
       </div>
     </div>
   );
 };
 
 export default connect((state, { match }) => ({
-  post: getPostById(state, match.params.postId)
+  post: getPostById(state, match.params.postId),
+  comments: getCommentsForPost(state, match.params.postId)
 }))(PostDetail);
