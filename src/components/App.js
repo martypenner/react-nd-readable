@@ -43,6 +43,7 @@ const App = () => (
                 style={{
                   marginLeft: 'auto' // Pin to the end of the row
                 }}>
+                <NavLink to="/">All posts</NavLink>
                 <NavLink to="/edit/1">Add post</NavLink>
               </div>
             </Row>
