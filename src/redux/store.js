@@ -2,6 +2,7 @@ import { routerMiddleware } from 'react-router-redux';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 
+import { fetchPosts } from '../redux/index';
 import history from '../utils/history';
 import rootReducer, { rootEpic } from './';
 
@@ -13,5 +14,7 @@ const store = createStore(
   rootReducer,
   composeEnhancers(applyMiddleware(epicMiddleware, routeMiddleware))
 );
+
+store.dispatch(fetchPosts());
 
 export default store;
