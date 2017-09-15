@@ -15,6 +15,10 @@ const EmptyComments = () => (
 );
 
 const PostDetail = ({ post }) => {
+  if (post == null) {
+    return null;
+  }
+
   const submittedDate = moment(post.timestamp);
 
   return (
