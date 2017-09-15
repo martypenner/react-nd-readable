@@ -1,3 +1,10 @@
+import { combineEpics } from 'redux-observable';
+import { ajax } from 'rxjs/observable/dom/ajax';
+import { Observable } from 'rxjs/Rx';
+import uuid from 'uuid/v4';
+
+import { apiBaseUrl, apiToken } from '../utils/api';
+
 const initialPosts = [
   {
     id: 1,
@@ -144,18 +151,8 @@ const initialPosts = [
 
 const postsReducer = (state = initialPosts, action) => {
   switch (action.type) {
-    case SAVE_POST:
-      // todo: temporary; need to save to server first
-      return [
-        ...state,
-        {
-          ...action.post,
-          id: 2,
-          timestamp: Date.now(),
-          voteScore: 1,
-          comments: []
-        }
-      ];
+    case SAVE_POST_SUCCEEDED:
+      return [...state, action.payload];
     default:
       return state;
   }
@@ -187,7 +184,10 @@ const UPDATE_POST_AUTHOR = 'UPDATE_POST_AUTHOR';
 const UPDATE_POST_BODY = 'UPDATE_POST_BODY';
 const UPDATE_POST_TITLE = 'UPDATE_POST_TITLE';
 const UPDATE_POST_CATEGORY = 'UPDATE_POST_CATEGORY';
+
 const SAVE_POST = 'SAVE_POST';
+const SAVE_POST_SUCCEEDED = 'SAVE_POST_SUCCEEDED';
+const SAVE_POST_FAILED = 'SAVE_POST_FAILED';
 
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
@@ -209,19 +209,23 @@ export const updatePostCategory = category => ({
   category
 });
 
-export const savePost = post => ({
+export const savePost = payload => ({
   type: SAVE_POST,
-  post
+  payload
 });
 
 const initialEditingState = {
-  author: '',
-  title: '',
-  body: '',
-  category: initialCategories[0].name
+  post: {
+    author: '',
+    title: '',
+    body: '',
+    category: initialCategories[0].name
+  },
+  isSaving: false,
+  error: null
 };
 
-const editingPostReducer = (state = initialEditingState, action) => {
+const postReducer = (state = initialEditingState.post, action) => {
   switch (action.type) {
     case UPDATE_POST_AUTHOR:
       return { ...state, author: action.author };
@@ -231,10 +235,23 @@ const editingPostReducer = (state = initialEditingState, action) => {
       return { ...state, title: action.title };
     case UPDATE_POST_CATEGORY:
       return { ...state, category: action.category };
-    case SAVE_POST:
-      return initialEditingState;
     default:
       return state;
+  }
+};
+
+const editingPostReducer = (state = initialEditingState, action) => {
+  const newState = { ...state, post: postReducer(state.post, action) };
+
+  switch (action.type) {
+    case SAVE_POST:
+      return { ...newState, isSaving: true };
+    case SAVE_POST_FAILED:
+      return { ...newState, isSaving: false, error: action.payload };
+    case SAVE_POST_SUCCEEDED:
+      return initialEditingState;
+    default:
+      return newState;
   }
 };
 
@@ -244,8 +261,9 @@ export const getAllPosts = state => state.posts;
 export const getAllPostsSortedByKey = (state, key) =>
   getAllPosts(state).sort((a, b) => a[key] - b[key]);
 export const getPostById = (state, id) =>
-  getAllPosts(state).find(post => Number(post.id) === Number(id));
-export const getEditingPost = state => state.editingPost;
+  getAllPosts(state).find(post => String(post.id) === String(id));
+export const getEditingPost = state => state.editing.post;
+export const isSavingPost = state => state.editing.isSaving;
 
 export const getAllCategories = state => state.categories;
 
@@ -254,13 +272,46 @@ export const getAllCategories = state => state.categories;
 const initialRootState = {
   posts: initialPosts,
   categories: initialCategories,
-  editingPost: initialEditingState
+  editing: initialEditingState
 };
 
 const rootReducer = (state = initialRootState, action) => ({
   posts: postsReducer(state.posts, action),
   categories: categoriesReducer(state.categories, action),
-  editingPost: editingPostReducer(state.editingPost, action)
+  editing: editingPostReducer(state.editing, action)
 });
 
 export default rootReducer;
+
+/** Epics **/
+
+const savePostEpic = action$ =>
+  action$.ofType(SAVE_POST).mergeMap(action => {
+    const post = {
+      ...action.payload,
+      id: uuid(),
+      timestamp: Date.now(),
+      comments: [],
+      voteScore: 1
+    };
+
+    return ajax
+      .post(`${apiBaseUrl}/posts`, post, {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: apiToken
+      })
+      .map(response => ({
+        type: SAVE_POST_SUCCEEDED,
+        payload: post
+      }))
+      .catch(error =>
+        Observable.of({
+          type: SAVE_POST_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      );
+  });
+
+export const rootEpic = combineEpics(savePostEpic);

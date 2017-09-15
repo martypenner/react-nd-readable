@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import {
   getAllCategories,
   getEditingPost,
+  isSavingPost,
   savePost,
   updatePostAuthor,
   updatePostBody,
@@ -29,7 +30,7 @@ const EditPost = ({
     <div>
       <TextField
         floatingLabelText="Author"
-        hintText="The name of the author"
+        hintText="Your name"
         value={post.author}
         onChange={e => updatePostAuthor(e.target.value)}
       />
@@ -86,8 +87,9 @@ export default connect(
       post,
       categories: getAllCategories(state),
       canSubmitForm:
+        !isSavingPost(state) &&
         requiredFields.filter(field => Boolean(post[field])).length ===
-        requiredFields.length
+          requiredFields.length
     };
   },
   {
