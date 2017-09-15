@@ -4,9 +4,10 @@ import Appbar from 'muicss/lib/react/appbar';
 import Container from 'muicss/lib/react/container';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
+import { Link, Route, Router, Switch } from 'react-router-dom';
 
 import store from '../redux/store';
+import history from '../utils/history';
 import EditPost from './EditPost';
 import Home from './Home';
 import Logo from './Logo';
@@ -17,7 +18,7 @@ import PostsByCategory from './PostsByCategory';
 const App = () => (
   <MuiThemeProvider>
     <Provider store={store}>
-      <Router>
+      <Router history={history}>
         <div>
           <Appbar style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
             <Row flex="1" alignItems="center">

@@ -1,3 +1,5 @@
+import { routerReducer } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import { combineEpics } from 'redux-observable';
 import { ajax } from 'rxjs/observable/dom/ajax';
 import { Observable } from 'rxjs/Rx';
@@ -278,7 +280,8 @@ const initialRootState = {
 const rootReducer = (state = initialRootState, action) => ({
   posts: postsReducer(state.posts, action),
   categories: categoriesReducer(state.categories, action),
-  editing: editingPostReducer(state.editing, action)
+  editing: editingPostReducer(state.editing, action),
+  routing: routerReducer
 });
 
 export default rootReducer;
@@ -301,10 +304,12 @@ const savePostEpic = action$ =>
         Accept: 'application/json',
         Authorization: apiToken
       })
-      .map(response => ({
-        type: SAVE_POST_SUCCEEDED,
-        payload: post
-      }))
+      .mergeMap(response =>
+        Observable.of({
+          type: SAVE_POST_SUCCEEDED,
+          payload: post
+        }).concat(Observable.of(push('/')))
+      )
       .catch(error =>
         Observable.of({
           type: SAVE_POST_FAILED,
