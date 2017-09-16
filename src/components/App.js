@@ -6,6 +6,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { Link, Route, Router, Switch } from 'react-router-dom';
 
+import { fetchInitialData } from '../redux/index';
 import store from '../redux/store';
 import history from '../utils/history';
 import EditPost from './EditPost';
@@ -14,6 +15,8 @@ import Logo from './Logo';
 import NavLink from './NavLink';
 import PostDetail from './PostDetail';
 import PostsByCategory from './PostsByCategory';
+
+store.dispatch(fetchInitialData());
 
 const App = () => (
   <MuiThemeProvider>
