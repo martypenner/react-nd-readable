@@ -76,7 +76,12 @@ const FETCH_COMMENTS_SUCCEEDED = 'FETCH_COMMENTS_SUCCEEDED';
 const FETCH_COMMENTS_FAILED = 'FETCH_COMMENTS_FAILED';
 
 const VOTE_POST_UP = 'VOTE_POST_UP';
+const VOTE_POST_UP_SUCCEEDED = 'VOTE_POST_UP_SUCCEEDED';
+const VOTE_POST_UP_FAILED = 'VOTE_POST_UP_FAILED';
+
 const VOTE_POST_DOWN = 'VOTE_POST_DOWN';
+const VOTE_POST_DOWN_SUCCEEDED = 'VOTE_POST_DOWN_SUCCEEDED';
+const VOTE_POST_DOWN_FAILED = 'VOTE_POST_DOWN_FAILED';
 
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
@@ -248,6 +253,56 @@ export const fetchCommentsEpic = action$ =>
       )
   );
 
+export const votePostUpEpic = action$ =>
+  action$.ofType(VOTE_POST_UP).mergeMap(action =>
+    ajax
+      .post(
+        `${apiBaseUrl}/posts/${action.payload}`,
+        { option: 'upVote' },
+        {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: apiToken
+        }
+      )
+      .map(response => ({
+        type: VOTE_POST_UP_SUCCEEDED,
+        payload: response
+      }))
+      .catch(error =>
+        Observable.of({
+          type: VOTE_POST_UP_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      )
+  );
+
+export const votePostDownEpic = action$ =>
+  action$.ofType(VOTE_POST_DOWN).mergeMap(action =>
+    ajax
+      .post(
+        `${apiBaseUrl}/posts/${action.payload}`,
+        { option: 'downVote' },
+        {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: apiToken
+        }
+      )
+      .map(response => ({
+        type: VOTE_POST_DOWN_SUCCEEDED,
+        payload: response
+      }))
+      .catch(error =>
+        Observable.of({
+          type: VOTE_POST_DOWN_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      )
+  );
+
 const savePostEpic = action$ =>
   action$.ofType(SAVE_POST).mergeMap(action => {
     const post = {
@@ -267,7 +322,7 @@ const savePostEpic = action$ =>
       .mergeMap(response =>
         Observable.of({
           type: SAVE_POST_SUCCEEDED,
-          payload: post
+          payload: response
         }).concat(Observable.of(push('/')))
       )
       .catch(error =>
@@ -282,5 +337,7 @@ const savePostEpic = action$ =>
 export const rootEpic = combineEpics(
   savePostEpic,
   fetchInitialDataEpic,
-  fetchCommentsEpic
+  fetchCommentsEpic,
+  votePostUpEpic,
+  votePostDownEpic
 );
