@@ -1,4 +1,3 @@
-import { routerReducer } from 'react-router-redux';
 import { push } from 'react-router-redux';
 import { combineEpics } from 'redux-observable';
 import { ajax } from 'rxjs/observable/dom/ajax';
@@ -157,8 +156,7 @@ const rootReducer = (state = initialRootState, action) => ({
   posts: postsReducer(state.posts, action),
   categories: categoriesReducer(state.categories, action),
   editing: editingPostReducer(state.editing, action),
-  comments: commentsReducer(state.comments, action),
-  routing: routerReducer
+  comments: commentsReducer(state.comments, action)
 });
 
 export default rootReducer;
