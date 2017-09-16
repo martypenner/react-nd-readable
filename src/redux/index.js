@@ -11,6 +11,18 @@ const postsReducer = (state = [], action) => {
     case SAVE_POST_SUCCEEDED:
     case FETCH_POSTS_SUCCEEDED:
       return state.concat(action.payload);
+    case VOTE_POST_UP:
+      const post = state.find(post => post.id === action.payload);
+
+      return state
+        .filter(post => post.id !== action.payload)
+        .concat({ ...post, voteScore: post.voteScore + 1 });
+    case VOTE_POST_DOWN:
+      const foundPost = state.find(post => post.id === action.payload);
+
+      return state
+        .filter(post => post.id !== action.payload)
+        .concat({ ...foundPost, voteScore: foundPost.voteScore - 1 });
     default:
       return state;
   }
@@ -63,6 +75,9 @@ const FETCH_COMMENTS = 'FETCH_COMMENTS';
 const FETCH_COMMENTS_SUCCEEDED = 'FETCH_COMMENTS_SUCCEEDED';
 const FETCH_COMMENTS_FAILED = 'FETCH_COMMENTS_FAILED';
 
+const VOTE_POST_UP = 'VOTE_POST_UP';
+const VOTE_POST_DOWN = 'VOTE_POST_DOWN';
+
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
   author
@@ -92,6 +107,8 @@ export const fetchInitialData = () => ({ type: FETCH_INITIAL_DATA });
 export const fetchCategories = () => ({ type: FETCH_CATEGORIES });
 export const fetchPosts = () => ({ type: FETCH_POSTS });
 export const fetchComments = payload => ({ type: FETCH_COMMENTS, payload });
+export const votePostUp = payload => ({ type: VOTE_POST_UP, payload });
+export const votePostDown = payload => ({ type: VOTE_POST_DOWN, payload });
 
 const initialEditingState = {
   post: {

@@ -1,13 +1,19 @@
+import createClass from 'create-react-class';
 import Col from 'jsxstyle/Col';
 import Flex from 'jsxstyle/Flex';
 import Row from 'jsxstyle/Row';
-import createClass from 'create-react-class';
 import * as moment from 'moment';
 import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
 
-import { getCommentsForPost, getPostById, fetchComments } from '../redux';
+import {
+  fetchComments,
+  getCommentsForPost,
+  getPostById,
+  votePostDown,
+  votePostUp
+} from '../redux';
 import Comment from './Comment';
 import Voter from './Voter';
 
@@ -21,7 +27,7 @@ const PostDetail = createClass({
   },
 
   render() {
-    const { post, comments } = this.props;
+    const { post, comments, votePostUp, votePostDown } = this.props;
     if (post == null) {
       return null;
     }
@@ -32,7 +38,11 @@ const PostDetail = createClass({
       <div>
         <Flex style={{ marginBottom: '1rem' }}>
           <Row flex="1" justifyContent="space-between">
-            <Voter voteScore={post.voteScore} />
+            <Voter
+              voteScore={post.voteScore}
+              voteUp={() => votePostUp(post.id)}
+              voteDown={() => votePostDown(post.id)}
+            />
 
             <Col flex="30">
               <div>
@@ -91,6 +101,8 @@ export default connect(
     comments: getCommentsForPost(state, match.params.postId)
   }),
   {
-    fetchComments
+    fetchComments,
+    votePostUp,
+    votePostDown
   }
 )(PostDetail);
