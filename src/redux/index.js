@@ -9,16 +9,21 @@ import { apiBaseUrl, apiToken } from '../utils/api';
 const postsReducer = (state = [], action) => {
   switch (action.type) {
     case SAVE_POST_SUCCEEDED:
-      return [...state, action.payload];
     case FETCH_POSTS_SUCCEEDED:
-      return [...state, ...action.payload];
+      return state.concat(action.payload);
     default:
       return state;
   }
 };
 
-const commentsReducer = (state = [], action) => {
+const commentsReducer = (state = {}, action) => {
   switch (action.type) {
+    case FETCH_COMMENTS_SUCCEEDED:
+      if (!action.payload[0]) {
+        return { ...state };
+      }
+
+      return { ...state, [action.payload[0].parentId]: action.payload };
     default:
       return state;
   }
@@ -29,7 +34,7 @@ const initialCategories = [];
 const categoriesReducer = (state = initialCategories, action) => {
   switch (action.type) {
     case FETCH_CATEGORIES_SUCCEEDED:
-      return [...state, ...action.payload];
+      return state.concat(action.payload);
     default:
       return state;
   }
@@ -86,7 +91,7 @@ export const savePost = payload => ({
 export const fetchInitialData = () => ({ type: FETCH_INITIAL_DATA });
 export const fetchCategories = () => ({ type: FETCH_CATEGORIES });
 export const fetchPosts = () => ({ type: FETCH_POSTS });
-export const fetchComments = () => ({ type: FETCH_COMMENTS });
+export const fetchComments = payload => ({ type: FETCH_COMMENTS, payload });
 
 const initialEditingState = {
   post: {
@@ -148,9 +153,9 @@ export const getCommentsForPost = (state, postId) =>
 
 const initialRootState = {
   posts: [],
-  categories: initialCategories,
+  categories: [],
   editing: initialEditingState,
-  comments: []
+  comments: {}
 };
 
 const rootReducer = (state = initialRootState, action) => ({
@@ -206,6 +211,26 @@ const fetchInitialDataEpic = action$ =>
     ).mergeMap(actions => Observable.from(actions))
   );
 
+export const fetchCommentsEpic = action$ =>
+  action$.ofType(FETCH_COMMENTS).switchMap(action =>
+    ajax
+      .getJSON(`${apiBaseUrl}/posts/${action.payload}/comments`, {
+        Accept: 'application/json',
+        Authorization: apiToken
+      })
+      .map(comments => ({
+        type: FETCH_COMMENTS_SUCCEEDED,
+        payload: comments
+      }))
+      .catch(error =>
+        Observable.of({
+          type: FETCH_COMMENTS_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      )
+  );
+
 const savePostEpic = action$ =>
   action$.ofType(SAVE_POST).mergeMap(action => {
     const post = {
@@ -237,4 +262,8 @@ const savePostEpic = action$ =>
       );
   });
 
-export const rootEpic = combineEpics(savePostEpic, fetchInitialDataEpic);
+export const rootEpic = combineEpics(
+  savePostEpic,
+  fetchInitialDataEpic,
+  fetchCommentsEpic
+);
