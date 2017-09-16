@@ -149,7 +149,8 @@ export const getCommentsForPost = (state, postId) =>
 const initialRootState = {
   posts: [],
   categories: initialCategories,
-  editing: initialEditingState
+  editing: initialEditingState,
+  comments: []
 };
 
 const rootReducer = (state = initialRootState, action) => ({
