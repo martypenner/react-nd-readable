@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+
+import PostHeader from './PostHeader';
 
 const EmptyPosts = () => (
   <div className="mui--text-dark-secondary">No posts were found</div>
@@ -11,7 +12,7 @@ const Posts = ({ posts }) => (
 
     {posts.map(post => (
       <div key={post.id}>
-        <Link to={`/${post.category}/${post.id}`}>{post.title}</Link>
+        <PostHeader post={post} linkTitle />
       </div>
     ))}
 

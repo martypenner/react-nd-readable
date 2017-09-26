@@ -1,8 +1,4 @@
 import createClass from 'create-react-class';
-import Col from 'jsxstyle/Col';
-import Flex from 'jsxstyle/Flex';
-import Row from 'jsxstyle/Row';
-import * as moment from 'moment';
 import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
@@ -15,7 +11,7 @@ import {
   votePostUp
 } from '../redux';
 import Comment from './Comment';
-import Voter from './Voter';
+import PostHeader from './PostHeader';
 
 const EmptyComments = () => (
   <div className="mui--text-dark-secondary">This post has no comments</div>
@@ -27,57 +23,14 @@ const PostDetail = createClass({
   },
 
   render() {
-    const { post, comments, votePostUp, votePostDown } = this.props;
+    const { post, comments } = this.props;
     if (post == null) {
       return null;
     }
 
-    const submittedDate = moment(post.timestamp);
-
     return (
       <div>
-        <Flex style={{ marginBottom: '1rem' }}>
-          <Row flex="1" justifyContent="space-between">
-            <Voter
-              voteScore={post.voteScore}
-              voteUp={() => votePostUp(post.id)}
-              voteDown={() => votePostDown(post.id)}
-            />
-
-            <Col flex="30">
-              <div>
-                <div
-                  className="mui--text-display1"
-                  style={{ marginBottom: '0.5rem' }}>
-                  {post.title}
-                </div>
-                <div className="mui--text-caption mui--text-dark-secondary">
-                  submitted{' '}
-                  <time
-                    title={submittedDate.toISOString()}
-                    dateTime={submittedDate.toISOString()}>
-                    {submittedDate.fromNow()}
-                  </time>{' '}
-                  by <span className="author">{post.author}</span>
-                </div>
-              </div>
-
-              <a
-                href={`${window.location.href.replace(
-                  /(.+)#.*/gi,
-                  '$1'
-                )}#comments`}
-                rel="nofollow">
-                {comments.length} comment{comments.length === 0 ||
-                comments.length > 1 ? (
-                  's'
-                ) : (
-                  ''
-                )}
-              </a>
-            </Col>
-          </Row>
-        </Flex>
+        <PostHeader post={post} />
 
         <Markdown source={post.body} />
 
