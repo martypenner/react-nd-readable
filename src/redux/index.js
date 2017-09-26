@@ -234,7 +234,7 @@ const fetchInitialDataEpic = action$ =>
   );
 
 export const fetchCommentsEpic = action$ =>
-  action$.ofType(FETCH_COMMENTS).switchMap(action =>
+  action$.ofType(FETCH_COMMENTS).mergeMap(action =>
     ajax
       .getJSON(`${apiBaseUrl}/posts/${action.payload}/comments`, {
         Accept: 'application/json',
