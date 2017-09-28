@@ -6,17 +6,13 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { Link, Route, Router, Switch } from 'react-router-dom';
 
-import { fetchInitialData } from '../redux/index';
 import store from '../redux/store';
 import history from '../utils/history';
 import EditPost from './EditPost';
-import Home from './Home';
 import Logo from './Logo';
 import NavLink from './NavLink';
 import PostDetail from './PostDetail';
-import PostsByCategory from './PostsByCategory';
-
-store.dispatch(fetchInitialData());
+import PostsAndCategories from './PostsAndCategories';
 
 const App = () => (
   <MuiThemeProvider>
@@ -54,9 +50,9 @@ const App = () => (
 
           <Container fluid style={{ padding: '4rem' }}>
             <Switch>
-              <Route path="/" exact component={Home} />
+              <Route path="/" exact component={PostsAndCategories} />
               <Route path="/edit/:postId" component={EditPost} />
-              <Route path="/:category" exact component={PostsByCategory} />
+              <Route path="/:category" exact component={PostsAndCategories} />
               <Route path="/:category/:postId" component={PostDetail} />
             </Switch>
           </Container>

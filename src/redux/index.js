@@ -6,23 +6,40 @@ import uuid from 'uuid/v4';
 
 import { apiBaseUrl, apiToken } from '../utils/api';
 
-const postsReducer = (state = [], action) => {
+const postsInitialState = { posts: [], sortBy: 'voteScore' };
+
+const postsReducer = (state = postsInitialState, action) => {
   switch (action.type) {
     case SAVE_POST_SUCCEEDED:
     case FETCH_POSTS_SUCCEEDED:
-      return state.concat(action.payload);
+      return { ...state, posts: state.posts.concat(action.payload) };
     case VOTE_POST_UP:
-      const post = state.find(post => post.id === action.payload);
+      const post = state.posts.find(post => post.id === action.payload);
 
-      return state
-        .filter(post => post.id !== action.payload)
-        .concat({ ...post, voteScore: post.voteScore + 1 });
+      return {
+        ...state,
+        posts: state.posts
+          .filter(post => post.id !== action.payload)
+          .concat({ ...post, voteScore: post.voteScore + 1 })
+      };
     case VOTE_POST_DOWN:
-      const foundPost = state.find(post => post.id === action.payload);
+      const foundPost = state.posts.find(post => post.id === action.payload);
 
-      return state
-        .filter(post => post.id !== action.payload)
-        .concat({ ...foundPost, voteScore: foundPost.voteScore - 1 });
+      return {
+        ...state,
+        posts: state.posts
+          .filter(post => post.id !== action.payload)
+          .concat({ ...foundPost, voteScore: foundPost.voteScore - 1 })
+      };
+    case UPDATE_POSTS_SORT_BY:
+      const allowedSortCriteria = ['voteScore', 'timestamp', 'alphabetical'];
+
+      return {
+        ...state,
+        sortBy: allowedSortCriteria.includes(action.payload)
+          ? action.payload
+          : allowedSortCriteria[0]
+      };
     default:
       return state;
   }
@@ -83,6 +100,8 @@ const VOTE_POST_DOWN = 'VOTE_POST_DOWN';
 const VOTE_POST_DOWN_SUCCEEDED = 'VOTE_POST_DOWN_SUCCEEDED';
 const VOTE_POST_DOWN_FAILED = 'VOTE_POST_DOWN_FAILED';
 
+const UPDATE_POSTS_SORT_BY = 'UPDATE_POSTS_SORT_BY';
+
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
   author
@@ -114,6 +133,10 @@ export const fetchPosts = () => ({ type: FETCH_POSTS });
 export const fetchComments = payload => ({ type: FETCH_COMMENTS, payload });
 export const votePostUp = payload => ({ type: VOTE_POST_UP, payload });
 export const votePostDown = payload => ({ type: VOTE_POST_DOWN, payload });
+export const updatePostsSortBy = payload => ({
+  type: UPDATE_POSTS_SORT_BY,
+  payload
+});
 
 const initialEditingState = {
   post: {
@@ -158,9 +181,19 @@ const editingPostReducer = (state = initialEditingState, action) => {
 
 /** Selectors **/
 
-export const getAllPosts = state => state.posts;
-export const getAllPostsSortedByKey = (state, key) =>
-  getAllPosts(state).sort((a, b) => a[key] - b[key]);
+export const getAllPosts = state => state.posts.posts;
+export const getAllPostsSorted = state => {
+  const sortBy = getPostsSortBy(state);
+
+  if (sortBy.toLowerCase() === 'alphabetical') {
+    return getAllPosts(state).sort((a, b) =>
+      a.title.localeCompare(b.title, 'en')
+    );
+  }
+
+  return getAllPosts(state).sort((a, b) => b[sortBy] - a[sortBy]);
+};
+export const getPostsSortBy = state => state.posts.sortBy;
 export const getPostById = (state, id) =>
   getAllPosts(state).find(post => String(post.id) === String(id));
 export const getEditingPost = state => state.editing.post;
@@ -174,7 +207,7 @@ export const getCommentsForPost = (state, postId) =>
 /** Root reducer **/
 
 const initialRootState = {
-  posts: [],
+  posts: postsInitialState,
   categories: [],
   editing: initialEditingState,
   comments: {}

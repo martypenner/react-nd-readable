@@ -52,7 +52,7 @@ const PostHeader = createClass({
               </div>
             </div>
 
-            <Link to={`${url}#comments`} rel="nofollow">
+            <Link to={{ pathname: url, hash: '#comments' }} rel="nofollow">
               {comments.length} comment{comments.length === 0 ||
               comments.length > 1 ? (
                 's'

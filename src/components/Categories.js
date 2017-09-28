@@ -6,7 +6,7 @@ const EmptyCategories = () => (
 );
 
 const Categories = ({ categories }) => (
-  <div>
+  <div style={{ marginBottom: 40 }}>
     <h2>Categories</h2>
 
     {categories.map(category => (

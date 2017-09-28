@@ -8,8 +8,6 @@ const EmptyPosts = () => (
 
 const Posts = ({ posts }) => (
   <div>
-    <h2>Posts</h2>
-
     {posts.map(post => (
       <div key={post.id}>
         <PostHeader post={post} linkTitle />
