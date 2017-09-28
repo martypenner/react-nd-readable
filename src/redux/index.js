@@ -355,7 +355,7 @@ const savePostEpic = action$ =>
       .mergeMap(response =>
         Observable.of({
           type: SAVE_POST_SUCCEEDED,
-          payload: response
+          payload: response.response
         }).concat(Observable.of(push('/')))
       )
       .catch(error =>
