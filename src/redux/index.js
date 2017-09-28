@@ -45,14 +45,45 @@ const postsReducer = (state = postsInitialState, action) => {
   }
 };
 
-const commentsReducer = (state = {}, action) => {
+const commentsInitialState = {
+  comments: {},
+  editing: {}
+};
+
+const commentsReducer = (state = commentsInitialState, action) => {
   switch (action.type) {
     case FETCH_COMMENTS_SUCCEEDED:
       if (!action.payload[0]) {
         return { ...state };
       }
 
-      return { ...state, [action.payload[0].parentId]: action.payload };
+      return {
+        ...state,
+        comments: {
+          ...state.comments,
+          [action.payload[0].parentId]: action.payload
+        }
+      };
+    case EDIT_COMMENT:
+      return {
+        ...state,
+        editing: { ...state.editing, [action.payload]: true }
+      };
+    case SAVE_COMMENT_SUCCEEDED:
+      return {
+        ...state,
+        comments: {
+          ...state.comments,
+          [action.payload.parentId]: state.comments[action.payload.parentId]
+            .filter(comment => comment.id !== action.payload.id)
+            .concat(action.payload)
+        },
+        editing: {
+          ...Object.keys(state.editing)
+            .filter(id => id !== action.payload.id)
+            .reduce((acc, id) => ({ ...acc, [id]: state.editing[id] }), {})
+        }
+      };
     default:
       return state;
   }
@@ -102,6 +133,12 @@ const VOTE_POST_DOWN_FAILED = 'VOTE_POST_DOWN_FAILED';
 
 const UPDATE_POSTS_SORT_BY = 'UPDATE_POSTS_SORT_BY';
 
+const EDIT_COMMENT = 'EDIT_COMMENT';
+
+const SAVE_COMMENT = 'SAVE_COMMENT';
+const SAVE_COMMENT_SUCCEEDED = 'SAVE_COMMENT_SUCCEEDED';
+const SAVE_COMMENT_FAILED = 'SAVE_COMMENT_FAILED';
+
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
   author
@@ -137,6 +174,8 @@ export const updatePostsSortBy = payload => ({
   type: UPDATE_POSTS_SORT_BY,
   payload
 });
+export const editComment = payload => ({ type: EDIT_COMMENT, payload });
+export const saveComment = payload => ({ type: SAVE_COMMENT, payload });
 
 const initialEditingState = {
   post: {
@@ -202,7 +241,10 @@ export const isSavingPost = state => state.editing.isSaving;
 export const getAllCategories = state => state.categories;
 
 export const getCommentsForPost = (state, postId) =>
-  state.comments[postId] || [];
+  (state.comments.comments[postId] || [])
+    .sort((a, b) => b.voteScore - a.voteScore);
+export const isEditingComment = (state, commentId) =>
+  state.comments.editing[commentId] || false;
 
 /** Root reducer **/
 
@@ -210,7 +252,7 @@ const initialRootState = {
   posts: postsInitialState,
   categories: [],
   editing: initialEditingState,
-  comments: {}
+  comments: commentsInitialState
 };
 
 const rootReducer = (state = initialRootState, action) => ({
@@ -367,8 +409,32 @@ const savePostEpic = action$ =>
       );
   });
 
+const saveCommentEpic = action$ =>
+  action$.ofType(SAVE_COMMENT).mergeMap(action => {
+    const comment = { ...action.payload };
+
+    return ajax
+      .post(`${apiBaseUrl}/comments`, comment, {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: apiToken
+      })
+      .map(response => ({
+        type: SAVE_COMMENT_SUCCEEDED,
+        payload: response.response
+      }))
+      .catch(error =>
+        Observable.of({
+          type: SAVE_COMMENT_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      );
+  });
+
 export const rootEpic = combineEpics(
   savePostEpic,
+  saveCommentEpic,
   fetchInitialDataEpic,
   fetchCommentsEpic,
   votePostUpEpic,

@@ -5,10 +5,7 @@ import ThumbDown from 'react-icons/lib/md/thumb-down';
 import ThumbUp from 'react-icons/lib/md/thumb-up';
 
 const Voter = ({ voteScore, voteUp, voteDown }) => (
-  <Col
-    flex="1"
-    style={{ minWidth: '4.4rem' }}
-    className="mui--text-dark-secondary">
+  <Col style={{ minWidth: '4.4rem' }} className="mui--text-dark-secondary">
     <span style={{ cursor: 'pointer' }} onClick={voteUp}>
       <ThumbUp
         color={colors.indigo500}

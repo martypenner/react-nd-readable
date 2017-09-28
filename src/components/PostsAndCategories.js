@@ -21,7 +21,7 @@ const Home = ({ posts, categories, sortBy }) => (
     <h2>Posts</h2>
 
     <Row alignItems="center">
-      <span style={{ marginRight: 20 }} className="mui--text-dark-secondary">
+      <span style={{ marginRight: '2rem' }} className="mui--text-dark-secondary">
         Sort by
       </span>
 

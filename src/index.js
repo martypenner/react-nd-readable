@@ -1,5 +1,6 @@
 import 'muicss/dist/css/mui.css';
 import './index.css';
+import './side-effects';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
