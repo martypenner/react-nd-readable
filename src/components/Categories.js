@@ -9,6 +9,10 @@ const Categories = ({ categories }) => (
   <div style={{ marginBottom: 40 }}>
     <h2>Categories</h2>
 
+    <div key="all">
+      <Link to="/">All posts</Link>
+    </div>
+
     {categories.map(category => (
       <div key={category.name}>
         <Link to={`/${category.path}`}>{category.name}</Link>
