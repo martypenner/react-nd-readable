@@ -7,7 +7,7 @@ import ThumbUp from 'react-icons/lib/md/thumb-up';
 const Voter = ({ voteScore, voteUp, voteDown }) => (
   <Col
     flex="1"
-    style={{ minWidth: '4.4rem', marginTop: '0.7rem' }}
+    style={{ minWidth: '4.4rem' }}
     className="mui--text-dark-secondary">
     <span style={{ cursor: 'pointer' }} onClick={voteUp}>
       <ThumbUp
@@ -17,7 +17,6 @@ const Voter = ({ voteScore, voteUp, voteDown }) => (
         tabIndex="0"
       />
     </span>
-    {/* todo: change look based on up- or down-voted */}
     <span>{voteScore}</span>
     <span style={{ cursor: 'pointer' }} onClick={voteDown}>
       <ThumbDown

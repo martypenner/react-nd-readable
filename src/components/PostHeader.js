@@ -28,11 +28,13 @@ const PostHeader = createClass({
     return (
       <Flex style={{ marginBottom: '1rem' }}>
         <Row flex="1" justifyContent="space-between">
-          <Voter
-            voteScore={post.voteScore}
-            voteUp={() => votePostUp(post.id)}
-            voteDown={() => votePostDown(post.id)}
-          />
+          <div style={{ marginTop: '0.7rem' }}>
+            <Voter
+              voteScore={post.voteScore}
+              voteUp={() => votePostUp(post.id)}
+              voteDown={() => votePostDown(post.id)}
+            />
+          </div>
 
           <Col flex="30">
             <div>

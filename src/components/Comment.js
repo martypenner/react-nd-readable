@@ -13,7 +13,7 @@ const Comment = ({ comment }) => {
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <Flex>
+      <Flex style={{ padding: '1rem', border: '1px solid #ccc' }}>
         <Row alignItems="flex-start">
           <Voter voteScore={comment.voteScore} />
 
