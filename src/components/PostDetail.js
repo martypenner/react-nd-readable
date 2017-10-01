@@ -1,15 +1,21 @@
 import createClass from 'create-react-class';
+import FlatButton from 'material-ui/FlatButton';
 import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
+import uuid from 'uuid/v4';
 
 import {
+  editComment,
   fetchComments,
   getCommentsForPost,
+  getNewCommentId,
   getPostById,
+  isAddingNewComment,
   votePostDown,
   votePostUp
 } from '../redux';
+import AddEditComment from './AddEditComment';
 import Comment from './Comment';
 import PostHeader from './PostHeader';
 
@@ -19,11 +25,17 @@ const EmptyComments = () => (
 
 const PostDetail = createClass({
   componentWillMount() {
-    this.props.fetchComments(this.props.match.params.postId);
+    const { fetchComments, match } = this.props;
+    fetchComments(match.params.postId);
+  },
+
+  editComment() {
+    const { editComment } = this.props;
+    editComment(uuid());
   },
 
   render() {
-    const { post, comments } = this.props;
+    const { post, comments, isAddingNew, newCommentId } = this.props;
     if (post == null) {
       return null;
     }
@@ -36,6 +48,18 @@ const PostDetail = createClass({
 
         <div>
           <h2 id="comments">Comments</h2>
+
+          {isAddingNew ? (
+            <div style={{ marginBottom: '2rem' }}>
+              <AddEditComment commentId={newCommentId} parentId={post.id} />
+            </div>
+          ) : (
+            <FlatButton
+              size="small"
+              label="Add comment"
+              onClick={this.editComment}
+            />
+          )}
 
           {comments.map(comment => (
             <Comment comment={comment} key={comment.id} />
@@ -51,11 +75,14 @@ const PostDetail = createClass({
 export default connect(
   (state, { match }) => ({
     post: getPostById(state, match.params.postId),
-    comments: getCommentsForPost(state, match.params.postId)
+    comments: getCommentsForPost(state, match.params.postId),
+    isAddingNew: isAddingNewComment(state, match.params.postId),
+    newCommentId: getNewCommentId(state, match.params.postId)
   }),
   {
     fetchComments,
     votePostUp,
-    votePostDown
+    votePostDown,
+    editComment
   }
 )(PostDetail);

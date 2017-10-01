@@ -240,11 +240,31 @@ export const isSavingPost = state => state.editing.isSaving;
 
 export const getAllCategories = state => state.categories;
 
+export const getAllComments = state => state.comments.comments;
 export const getCommentsForPost = (state, postId) =>
   (state.comments.comments[postId] || [])
     .sort((a, b) => b.voteScore - a.voteScore);
 export const isEditingComment = (state, commentId) =>
   state.comments.editing[commentId] || false;
+
+const getAddingCommentIdsForPost = (state, postId) => {
+  const editingComments = new Set(Object.keys(state.comments.editing));
+  const commentIdsForPost = new Set(
+    getCommentsForPost(state, postId).map(comment => comment.id)
+  );
+  const addingIds = new Set(
+    [...editingComments].filter(id => !commentIdsForPost.has(id))
+  );
+
+  return addingIds;
+};
+
+export const isAddingNewComment = (state, postId) =>
+  getAddingCommentIdsForPost(state, postId).size > 0;
+export const getNewCommentId = (state, postId) =>
+  getAddingCommentIdsForPost(state, postId)
+    .values()
+    .next().value;
 
 /** Root reducer **/
 
@@ -410,11 +430,9 @@ const savePostEpic = action$ =>
   });
 
 const saveCommentEpic = action$ =>
-  action$.ofType(SAVE_COMMENT).mergeMap(action => {
-    const comment = { ...action.payload };
-
-    return ajax
-      .post(`${apiBaseUrl}/comments`, comment, {
+  action$.ofType(SAVE_COMMENT).mergeMap(action =>
+    ajax
+      .post(`${apiBaseUrl}/comments`, action.payload, {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: apiToken
@@ -429,8 +447,8 @@ const saveCommentEpic = action$ =>
           payload: error.xhr.response,
           error: true
         })
-      );
-  });
+      )
+  );
 
 export const rootEpic = combineEpics(
   savePostEpic,
