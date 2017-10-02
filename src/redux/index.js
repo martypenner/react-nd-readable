@@ -99,6 +99,30 @@ const commentsReducer = (state = commentsInitialState, action) => {
             .reduce((acc, id) => ({ ...acc, [id]: state.editing[id] }), {})
         }
       };
+    case VOTE_COMMENT_UP:
+      const comment = action.payload;
+
+      return {
+        ...state,
+        comments: {
+          ...state.comments,
+          [comment.parentId]: state.comments[comment.parentId]
+            .filter(c => comment.id !== c.id)
+            .concat({ ...comment, voteScore: comment.voteScore + 1 })
+        }
+      };
+    case VOTE_COMMENT_DOWN:
+      const foundComment = action.payload;
+
+      return {
+        ...state,
+        comments: {
+          ...state.comments,
+          [foundComment.parentId]: state.comments[foundComment.parentId]
+            .filter(c => foundComment.id !== c.id)
+            .concat({ ...foundComment, voteScore: foundComment.voteScore - 1 })
+        }
+      };
     default:
       return state;
   }
@@ -158,6 +182,14 @@ const SAVE_COMMENT = 'SAVE_COMMENT';
 const SAVE_COMMENT_SUCCEEDED = 'SAVE_COMMENT_SUCCEEDED';
 const SAVE_COMMENT_FAILED = 'SAVE_COMMENT_FAILED';
 
+const VOTE_COMMENT_UP = 'VOTE_COMMENT_UP';
+const VOTE_COMMENT_UP_SUCCEEDED = 'VOTE_COMMENT_UP_SUCCEEDED';
+const VOTE_COMMENT_UP_FAILED = 'VOTE_COMMENT_UP_FAILED';
+
+const VOTE_COMMENT_DOWN = 'VOTE_COMMENT_DOWN';
+const VOTE_COMMENT_DOWN_SUCCEEDED = 'VOTE_COMMENT_DOWN_SUCCEEDED';
+const VOTE_COMMENT_DOWN_FAILED = 'VOTE_COMMENT_DOWN_FAILED';
+
 export const updatePostAuthor = author => ({
   type: UPDATE_POST_AUTHOR,
   author
@@ -193,9 +225,15 @@ export const updatePostsSortBy = payload => ({
   type: UPDATE_POSTS_SORT_BY,
   payload
 });
+
 export const editComment = payload => ({ type: EDIT_COMMENT, payload });
 export const removeComment = payload => ({ type: REMOVE_COMMENT, payload });
 export const saveComment = payload => ({ type: SAVE_COMMENT, payload });
+export const voteCommentUp = payload => ({ type: VOTE_COMMENT_UP, payload });
+export const voteCommentDown = payload => ({
+  type: VOTE_COMMENT_DOWN,
+  payload
+});
 
 const initialEditingState = {
   post: {
@@ -496,12 +534,64 @@ const removeCommentEpic = action$ =>
       )
   );
 
+export const voteCommentUpEpic = action$ =>
+  action$.ofType(VOTE_COMMENT_UP).mergeMap(action =>
+    ajax
+      .post(
+        `${apiBaseUrl}/comments/${action.payload.id}`,
+        { option: 'upVote' },
+        {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: apiToken
+        }
+      )
+      .map(response => ({
+        type: VOTE_COMMENT_UP_SUCCEEDED,
+        payload: response
+      }))
+      .catch(error =>
+        Observable.of({
+          type: VOTE_COMMENT_UP_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      )
+  );
+
+export const voteCommentDownEpic = action$ =>
+  action$.ofType(VOTE_COMMENT_DOWN).mergeMap(action =>
+    ajax
+      .post(
+        `${apiBaseUrl}/comments/${action.payload.id}`,
+        { option: 'downVote' },
+        {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: apiToken
+        }
+      )
+      .map(response => ({
+        type: VOTE_COMMENT_DOWN_SUCCEEDED,
+        payload: response
+      }))
+      .catch(error =>
+        Observable.of({
+          type: VOTE_COMMENT_DOWN_FAILED,
+          payload: error.xhr.response,
+          error: true
+        })
+      )
+  );
+
 export const rootEpic = combineEpics(
+  fetchInitialDataEpic,
   savePostEpic,
+  votePostUpEpic,
+  votePostDownEpic,
+  fetchCommentsEpic,
   saveCommentEpic,
   removeCommentEpic,
-  fetchInitialDataEpic,
-  fetchCommentsEpic,
-  votePostUpEpic,
-  votePostDownEpic
+  voteCommentUpEpic,
+  voteCommentDownEpic
 );

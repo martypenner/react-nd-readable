@@ -10,7 +10,13 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
 
-import { editComment, isEditingComment, removeComment } from '../redux';
+import {
+  editComment,
+  isEditingComment,
+  removeComment,
+  voteCommentDown,
+  voteCommentUp
+} from '../redux';
 import AddEditComment from './AddEditComment';
 import Voter from './Voter';
 
@@ -26,14 +32,18 @@ const Comment = createClass({
   },
 
   render() {
-    const { comment, isEditing } = this.props;
+    const { comment, isEditing, voteCommentUp, voteCommentDown } = this.props;
     const date = moment(comment.timestamp);
 
     return (
       <div style={{ marginBottom: '2rem' }}>
         <Flex style={{ padding: '1rem', border: '1px solid #ccc' }}>
           <Row flex="1" alignItems="flex-start">
-            <Voter voteScore={comment.voteScore} />
+            <Voter
+              voteScore={comment.voteScore}
+              voteUp={() => voteCommentUp(comment)}
+              voteDown={() => voteCommentDown(comment)}
+            />
 
             <Col flex="1">
               {isEditing ? (
@@ -91,5 +101,5 @@ export default connect(
   (state, { comment }) => ({
     isEditing: isEditingComment(state, comment.id)
   }),
-  { editComment, removeComment }
+  { editComment, removeComment, voteCommentUp, voteCommentDown }
 )(Comment);
