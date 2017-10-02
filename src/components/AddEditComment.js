@@ -75,6 +75,7 @@ const AddEditComment = createClass({
           <TextField
             floatingLabelText="Author"
             hintText="Your name"
+            maxLength={140}
             value={author}
             onChange={this.onAuthorChange}
           />
@@ -99,6 +100,7 @@ const AddEditComment = createClass({
             multiLine={true}
             rows={3}
             rowsMax={10}
+            maxLength={2000}
             floatingLabelText="Text"
             hintText="The main content of your comment"
             value={body}
