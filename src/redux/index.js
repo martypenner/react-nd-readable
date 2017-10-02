@@ -84,6 +84,21 @@ const commentsReducer = (state = commentsInitialState, action) => {
             .reduce((acc, id) => ({ ...acc, [id]: state.editing[id] }), {})
         }
       };
+    case REMOVE_COMMENT_SUCCEEDED:
+      return {
+        ...state,
+        comments: {
+          ...state.comments,
+          [action.payload.parentId]: state.comments[
+            action.payload.parentId
+          ].filter(comment => comment.id !== action.payload.id)
+        },
+        editing: {
+          ...Object.keys(state.editing)
+            .filter(id => id !== action.payload.id)
+            .reduce((acc, id) => ({ ...acc, [id]: state.editing[id] }), {})
+        }
+      };
     default:
       return state;
   }
@@ -135,6 +150,10 @@ const UPDATE_POSTS_SORT_BY = 'UPDATE_POSTS_SORT_BY';
 
 const EDIT_COMMENT = 'EDIT_COMMENT';
 
+const REMOVE_COMMENT = 'REMOVE_COMMENT';
+const REMOVE_COMMENT_SUCCEEDED = 'REMOVE_COMMENT_SUCCEEDED';
+const REMOVE_COMMENT_FAILED = 'REMOVE_COMMENT_FAILED';
+
 const SAVE_COMMENT = 'SAVE_COMMENT';
 const SAVE_COMMENT_SUCCEEDED = 'SAVE_COMMENT_SUCCEEDED';
 const SAVE_COMMENT_FAILED = 'SAVE_COMMENT_FAILED';
@@ -175,6 +194,7 @@ export const updatePostsSortBy = payload => ({
   payload
 });
 export const editComment = payload => ({ type: EDIT_COMMENT, payload });
+export const removeComment = payload => ({ type: REMOVE_COMMENT, payload });
 export const saveComment = payload => ({ type: SAVE_COMMENT, payload });
 
 const initialEditingState = {
@@ -429,6 +449,7 @@ const savePostEpic = action$ =>
       );
   });
 
+// todo: saving an existing comment is different from saving a new comment
 const saveCommentEpic = action$ =>
   action$.ofType(SAVE_COMMENT).mergeMap(action =>
     ajax
@@ -450,9 +471,35 @@ const saveCommentEpic = action$ =>
       )
   );
 
+const removeCommentEpic = action$ =>
+  action$.ofType(REMOVE_COMMENT).mergeMap(action =>
+    Observable.defer(() => Observable.of(window.confirm('Remove the comment?')))
+      .filter(c => c)
+      .mergeMap(() =>
+        ajax
+          .delete(`${apiBaseUrl}/comments/${action.payload.id}`, {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: apiToken
+          })
+          .map(response => ({
+            type: REMOVE_COMMENT_SUCCEEDED,
+            payload: response.response
+          }))
+          .catch(error =>
+            Observable.of({
+              type: REMOVE_COMMENT_FAILED,
+              payload: error.xhr.response,
+              error: true
+            })
+          )
+      )
+  );
+
 export const rootEpic = combineEpics(
   savePostEpic,
   saveCommentEpic,
+  removeCommentEpic,
   fetchInitialDataEpic,
   fetchCommentsEpic,
   votePostUpEpic,

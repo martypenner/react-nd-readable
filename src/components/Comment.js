@@ -10,7 +10,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { connect } from 'react-redux';
 
-import { editComment, isEditingComment } from '../redux';
+import { editComment, isEditingComment, removeComment } from '../redux';
 import AddEditComment from './AddEditComment';
 import Voter from './Voter';
 
@@ -18,6 +18,11 @@ const Comment = createClass({
   editComment() {
     const { comment, editComment } = this.props;
     editComment(comment.id);
+  },
+
+  removeComment() {
+    const { comment, removeComment } = this.props;
+    removeComment(comment);
   },
 
   render() {
@@ -71,7 +76,9 @@ const Comment = createClass({
                 top: -14
               }}>
               <DropdownItem onClick={this.editComment}>Edit</DropdownItem>
-              <DropdownItem color="danger">Delete</DropdownItem>
+              <DropdownItem onClick={this.removeComment} color="danger">
+                Remove
+              </DropdownItem>
             </Dropdown>
           </Row>
         </Flex>
@@ -84,5 +91,5 @@ export default connect(
   (state, { comment }) => ({
     isEditing: isEditingComment(state, comment.id)
   }),
-  { editComment }
+  { editComment, removeComment }
 )(Comment);
