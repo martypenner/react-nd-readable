@@ -11,6 +11,12 @@ const postsInitialState = { posts: [], sortBy: 'voteScore' };
 const postsReducer = (state = postsInitialState, action) => {
   switch (action.type) {
     case SAVE_POST_SUCCEEDED:
+      return {
+        ...state,
+        posts: state.posts
+          .filter(post => post.id !== action.payload.id)
+          .concat({ comments: [], ...action.payload })
+      };
     case FETCH_POSTS_SUCCEEDED:
       return {
         ...state,
@@ -482,11 +488,10 @@ export const votePostDownEpic = action$ =>
 const savePostEpic = action$ =>
   action$.ofType(SAVE_POST).mergeMap(action => {
     const post = {
-      ...action.payload,
       id: uuid(),
       timestamp: Date.now(),
-      comments: [],
-      voteScore: 1
+      voteScore: 1,
+      ...action.payload
     };
 
     return ajax
@@ -499,8 +504,9 @@ const savePostEpic = action$ =>
         Observable.of({
           type: SAVE_POST_SUCCEEDED,
           payload: response.response
-        }).do(() => history.push(`/`))
+        })
       )
+      .do(() => history.push('/'))
       .catch(error =>
         Observable.of({
           type: SAVE_POST_FAILED,
