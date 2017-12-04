@@ -12,11 +12,11 @@ import { connect } from 'react-redux';
 
 import {
   editComment,
-  isEditingComment,
   removeComment,
   voteCommentDown,
   voteCommentUp
-} from '../redux';
+} from '../redux/actions';
+import { isEditingComment } from '../redux/selectors';
 import AddEditComment from './AddEditComment';
 import Voter from './Voter';
 

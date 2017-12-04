@@ -8,13 +8,15 @@ import uuid from 'uuid/v4';
 import {
   editComment,
   fetchComments,
+  votePostDown,
+  votePostUp
+} from '../redux/actions';
+import {
   getCommentsForPost,
   getNewCommentId,
   getPostById,
-  isAddingNewComment,
-  votePostDown,
-  votePostUp
-} from '../redux';
+  isAddingNewComment
+} from '../redux/selectors';
 import AddEditComment from './AddEditComment';
 import Comment from './Comment';
 import PostHeader from './PostHeader';

@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './components/App';
-import { fetchInitialData, updatePostsSortBy } from './redux';
+import { fetchInitialData, updatePostsSortBy } from './redux/actions';
 import store from './redux/store';
 import registerServiceWorker from './registerServiceWorker';
 import history from './utils/history';

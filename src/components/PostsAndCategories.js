@@ -4,7 +4,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, Route } from 'react-router-dom';
 
-import { getAllCategories, getAllPostsSorted, getPostsSortBy } from '../redux';
+import {
+  getAllCategories,
+  getAllPostsSorted,
+  getPostsSortBy
+} from '../redux/selectors';
 import Categories from './Categories';
 import Posts from './Posts';
 
@@ -21,7 +25,9 @@ const Home = ({ posts, categories, sortBy }) => (
     <h2>Posts</h2>
 
     <Row alignItems="center">
-      <span style={{ marginRight: '2rem' }} className="mui--text-dark-secondary">
+      <span
+        style={{ marginRight: '2rem' }}
+        className="mui--text-dark-secondary">
         Sort by
       </span>
 
@@ -33,7 +39,9 @@ const Home = ({ posts, categories, sortBy }) => (
                 <li
                   key={key}
                   className={key === sortBy ? 'mui--is-active' : ''}>
-                  <Link to={{ search: `?sortPostsBy=${key}` }}>{sortMap[key]}</Link>
+                  <Link to={{ search: `?sortPostsBy=${key}` }}>
+                    {sortMap[key]}
+                  </Link>
                 </li>
               ))}
             </ul>

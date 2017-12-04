@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { saveComment } from '../redux';
+import { saveComment } from '../redux/actions';
 
 const AddEditComment = createClass({
   getInitialState(...args) {

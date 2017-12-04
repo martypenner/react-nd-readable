@@ -12,12 +12,11 @@ import { Link, Route } from 'react-router-dom';
 import {
   editPost,
   fetchComments,
-  getCommentsForPost,
-  getEditingPost,
   removePost,
   votePostDown,
   votePostUp
-} from '../redux';
+} from '../redux/actions';
+import { getCommentsForPost, getEditingPost } from '../redux/selectors';
 import Voter from './Voter';
 
 const PostHeaderView = createClass({

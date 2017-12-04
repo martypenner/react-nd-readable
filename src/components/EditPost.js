@@ -6,15 +6,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  getAllCategories,
-  getEditingPost,
-  isSavingPost,
   savePost,
   updatePostAuthor,
   updatePostBody,
   updatePostCategory,
   updatePostTitle
-} from '../redux';
+} from '../redux/actions';
+import {
+  getAllCategories,
+  getEditingPost,
+  isSavingPost
+} from '../redux/selectors';
 
 const EditPost = ({
   post,
