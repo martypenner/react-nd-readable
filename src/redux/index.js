@@ -12,7 +12,10 @@ const postsReducer = (state = postsInitialState, action) => {
   switch (action.type) {
     case SAVE_POST_SUCCEEDED:
     case FETCH_POSTS_SUCCEEDED:
-      return { ...state, posts: state.posts.concat(action.payload) };
+      return {
+        ...state,
+        posts: state.posts.concat(action.payload.filter(p => !p.deleted))
+      };
     case VOTE_POST_UP:
       const post = state.posts.find(post => post.id === action.payload);
 
@@ -40,6 +43,11 @@ const postsReducer = (state = postsInitialState, action) => {
           ? action.payload
           : allowedSortCriteria[0]
       };
+    case REMOVE_POST_SUCCEEDED:
+      return {
+        ...state,
+        posts: state.posts.filter(post => post.id !== action.payload)
+      };
     default:
       return state;
   }
@@ -61,7 +69,9 @@ const commentsReducer = (state = commentsInitialState, action) => {
         ...state,
         comments: {
           ...state.comments,
-          [action.payload[0].parentId]: action.payload
+          [action.payload[0].parentId]: action.payload.filter(
+            c => !c.deleted && !c.parentDeleted
+          )
         }
       };
     case EDIT_COMMENT:
@@ -162,6 +172,12 @@ const FETCH_COMMENTS = 'FETCH_COMMENTS';
 const FETCH_COMMENTS_SUCCEEDED = 'FETCH_COMMENTS_SUCCEEDED';
 const FETCH_COMMENTS_FAILED = 'FETCH_COMMENTS_FAILED';
 
+const EDIT_POST = 'EDIT_POST';
+
+const REMOVE_POST = 'REMOVE_POST';
+const REMOVE_POST_SUCCEEDED = 'REMOVE_POST_SUCCEEDED';
+const REMOVE_POST_FAILED = 'REMOVE_POST_FAILED';
+
 const VOTE_POST_UP = 'VOTE_POST_UP';
 const VOTE_POST_UP_SUCCEEDED = 'VOTE_POST_UP_SUCCEEDED';
 const VOTE_POST_UP_FAILED = 'VOTE_POST_UP_FAILED';
@@ -219,6 +235,8 @@ export const fetchInitialData = () => ({ type: FETCH_INITIAL_DATA });
 export const fetchCategories = () => ({ type: FETCH_CATEGORIES });
 export const fetchPosts = () => ({ type: FETCH_POSTS });
 export const fetchComments = payload => ({ type: FETCH_COMMENTS, payload });
+export const editPost = payload => ({ type: EDIT_POST, payload });
+export const removePost = payload => ({ type: REMOVE_POST, payload });
 export const votePostUp = payload => ({ type: VOTE_POST_UP, payload });
 export const votePostDown = payload => ({ type: VOTE_POST_DOWN, payload });
 export const updatePostsSortBy = payload => ({
@@ -271,6 +289,11 @@ const editingPostReducer = (state = initialEditingState, action) => {
       return { ...newState, isSaving: false, error: action.payload };
     case SAVE_POST_SUCCEEDED:
       return initialEditingState;
+    case EDIT_POST:
+      return {
+        ...state,
+        post: action.payload
+      };
     default:
       return newState;
   }
@@ -487,6 +510,31 @@ const savePostEpic = action$ =>
       );
   });
 
+const removePostEpic = action$ =>
+  action$.ofType(REMOVE_POST).mergeMap(action =>
+    Observable.defer(() => Observable.of(window.confirm('Remove the post?')))
+      .filter(c => c)
+      .mergeMap(() =>
+        ajax
+          .delete(`${apiBaseUrl}/posts/${action.payload.id}`, {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: apiToken
+          })
+          .map(response => ({
+            type: REMOVE_POST_SUCCEEDED,
+            payload: action.payload.id
+          }))
+          .catch(error =>
+            Observable.of({
+              type: REMOVE_POST_FAILED,
+              payload: error.xhr.response,
+              error: true
+            })
+          )
+      )
+  );
+
 // todo: saving an existing comment is different from saving a new comment
 const saveCommentEpic = action$ =>
   action$.ofType(SAVE_COMMENT).mergeMap(action =>
@@ -587,6 +635,7 @@ export const voteCommentDownEpic = action$ =>
 export const rootEpic = combineEpics(
   fetchInitialDataEpic,
   savePostEpic,
+  removePostEpic,
   votePostUpEpic,
   votePostDownEpic,
   fetchCommentsEpic,

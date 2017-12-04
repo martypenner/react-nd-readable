@@ -1,23 +1,39 @@
 import createClass from 'create-react-class';
-import { Link } from 'react-router-dom';
 import Col from 'jsxstyle/Col';
 import Flex from 'jsxstyle/Flex';
 import Row from 'jsxstyle/Row';
 import * as moment from 'moment';
+import Dropdown from 'muicss/lib/react/dropdown';
+import DropdownItem from 'muicss/lib/react/dropdown-item';
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link, Route } from 'react-router-dom';
 
 import {
+  editPost,
   fetchComments,
   getCommentsForPost,
+  getEditingPost,
+  removePost,
   votePostDown,
   votePostUp
 } from '../redux';
 import Voter from './Voter';
 
-const PostHeader = createClass({
+const PostHeaderView = createClass({
   componentWillMount() {
     this.props.fetchComments(this.props.post.id);
+  },
+
+  editPost() {
+    const { post, editPost, history } = this.props;
+    editPost(post);
+    history.push(`/edit/${post.id}`);
+  },
+
+  removePost() {
+    const { post, removePost } = this.props;
+    removePost(post);
   },
 
   render() {
@@ -63,18 +79,40 @@ const PostHeader = createClass({
               )}
             </Link>
           </Col>
+
+          <Dropdown
+            label="Actions"
+            style={{
+              margin: 0,
+              marginLeft: 'auto',
+              position: 'relative',
+              top: -14
+            }}>
+            <DropdownItem onClick={this.editPost}>Edit</DropdownItem>
+            <DropdownItem onClick={this.removePost} color="danger">
+              Remove
+            </DropdownItem>
+          </Dropdown>
         </Row>
       </Flex>
     );
   }
 });
 
+// Wrap it in a route so we have history
+const PostHeader = props => (
+  <Route render={navProps => <PostHeaderView {...navProps} {...props} />} />
+);
+
 export default connect(
-  (state, ownProps) => ({
-    comments: getCommentsForPost(state, ownProps.post.id)
+  (state, { post }) => ({
+    comments: getCommentsForPost(state, post.id),
+    isEditing: getEditingPost(state) != null
   }),
   {
     fetchComments,
+    editPost,
+    removePost,
     votePostUp,
     votePostDown
   }
