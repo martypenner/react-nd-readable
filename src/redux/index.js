@@ -541,7 +541,6 @@ const removePostEpic = action$ =>
       )
   );
 
-// todo: saving an existing comment is different from saving a new comment
 const saveCommentEpic = action$ =>
   action$.ofType(SAVE_COMMENT).mergeMap(action =>
     ajax
