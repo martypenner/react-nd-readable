@@ -1,10 +1,10 @@
-import { push } from 'react-router-redux';
 import { combineEpics } from 'redux-observable';
 import { ajax } from 'rxjs/observable/dom/ajax';
 import { Observable } from 'rxjs/Rx';
 import uuid from 'uuid/v4';
 
 import { apiBaseUrl, apiToken } from '../utils/api';
+import history from '../utils/history';
 
 const postsInitialState = { posts: [], sortBy: 'voteScore' };
 
@@ -499,7 +499,7 @@ const savePostEpic = action$ =>
         Observable.of({
           type: SAVE_POST_SUCCEEDED,
           payload: response.response
-        }).concat(Observable.of(push('/')))
+        }).do(() => history.push(`/`))
       )
       .catch(error =>
         Observable.of({
