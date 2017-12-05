@@ -29,7 +29,7 @@
     "prettier": "^1.6.1"
   },
   "scripts": {
-    "start": "concurrently --kill-others --names 'server,client' 'node ./node_modules/reddit-clone-server/server.js' 'react-scripts start'",
+    "start": "concurrently --kill-others --names \"server,client\" \"node ./node_modules/reddit-clone-server/server.js\" \"react-scripts start\"",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
