@@ -12,11 +12,13 @@ import {
   votePostUp
 } from '../redux/actions';
 import {
+  getAllPosts,
   getCommentsForPost,
   getNewCommentId,
   getPostById,
   isAddingNewComment
 } from '../redux/selectors';
+import history from '../utils/history';
 import AddEditComment from './AddEditComment';
 import Comment from './Comment';
 import PostHeader from './PostHeader';
@@ -37,8 +39,14 @@ const PostDetail = createClass({
   },
 
   render() {
-    const { post, comments, isAddingNew, newCommentId } = this.props;
+    const { post, allPosts, comments, isAddingNew, newCommentId } = this.props;
+
     if (post == null) {
+      // Redirect to root if posts have been fetched, and no post with the given ID exist
+      if (allPosts.length > 0) {
+        history.replace('/');
+      }
+
       return null;
     }
 
@@ -77,6 +85,7 @@ const PostDetail = createClass({
 export default connect(
   (state, { match }) => ({
     post: getPostById(state, match.params.postId),
+    allPosts: getAllPosts(state),
     comments: getCommentsForPost(state, match.params.postId),
     isAddingNew: isAddingNewComment(state, match.params.postId),
     newCommentId: getNewCommentId(state, match.params.postId)
