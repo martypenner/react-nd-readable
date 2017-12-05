@@ -38,7 +38,8 @@ export const commentsReducer = (state = commentsInitialState, action) => {
         ...state,
         comments: {
           ...state.comments,
-          [action.payload.parentId]: state.comments[action.payload.parentId]
+          [action.payload.parentId]: (state.comments[action.payload.parentId] ||
+            [])
             .filter(comment => comment.id !== action.payload.id)
             .concat(action.payload)
         },
