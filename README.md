@@ -1,13 +1,13 @@
 ## Prerequisites
 
-* [npm](https://nodejs.org/en/download/)
+* [yarn](https://yarnpkg.com/en/docs/install)
 
 ## Installation
 
 * `git clone <repository-url>` this repository
 * `cd` into the new directory
-* `npm install`
+* `yarn install`
 
 ## Running / Development
 
-* `npm start`
+* `yarn start`
