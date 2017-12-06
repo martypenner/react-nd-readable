@@ -18,9 +18,9 @@ import {
   getPostById,
   isAddingNewComment
 } from '../redux/selectors';
-import history from '../utils/history';
 import AddEditComment from './AddEditComment';
 import Comment from './Comment';
+import PostNotFound from './PostNotFound';
 import PostHeader from './PostHeader';
 
 const EmptyComments = () => (
@@ -42,9 +42,8 @@ const PostDetail = createClass({
     const { post, allPosts, comments, isAddingNew, newCommentId } = this.props;
 
     if (post == null) {
-      // Redirect to root if posts have been fetched, and no post with the given ID exist
       if (allPosts.length > 0) {
-        history.replace('/');
+        return <PostNotFound />;
       }
 
       return null;
